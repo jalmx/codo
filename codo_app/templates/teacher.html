@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+
+{% block title %} {{title}} {% endblock%}
+
+{% block main %}
+
+<h1>Docentes</h1>
+
+{% if error == "register" %}
+<div class="toast-container position-fixed bottom-0 end-0 p-3" id="toast-error">
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <img src="..." class="rounded me-2" alt="...">
+            <strong class="me-auto">Error</strong>
+            <small>1 minuto</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            Error al registrar el Docente
+        </div>
+    </div>
+</div>
+
+{% endif %}
+
+<div class="row">
+    <div class="col-sm-12 d-flex justify-content-end">
+        <input class="btn btn-success" id="load-csv" value="Carga CSV" type="file">
+    </div>
+</div>
+<div class="row">
+    {% include "form_add_teacher.html" with key=teacher%}
+    <div class="col-sm-12 col-md-6 col-lg-8 col-xl-8 overflow-x-auto">
+        <table class="table table-stripe table-hover table-striped-columns">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Correo principal</th>
+                    <th scope="col">Correo secundario</th>
+                    <th scope="col">Opciones</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for teacher in teachers %}
+                <tr>
+                    <td class="text-nowrap">{{forloop.counter}}</td>
+                    <td class="text-nowrap">{{teacher.name}}</td>
+                    <td class="text-nowrap">{{teacher.email1}}</td>
+                    {% if teacher.email2 %}
+                    <td class="text-nowrap">{{teacher.email2}}</td>
+                    {% else %}
+                    <td class="text-nowrap"></td>
+                    {% endif %}
+
+                    <td class="text-nowrap">
+                        <form action="/docentes/" method="post" style="display: inline;">{% csrf_token %}
+                            <input type="text" hidden value="{{teacher.email1}}" name="edit">
+                            <input class="btn btn-warning"  type="submit" value="Editar">
+                        </form>
+                        <form action="/delete" method="post" style="display: inline;">{% csrf_token %}
+                            <input type="text" hidden value="{{teacher.email1}}" name="delete">
+                            <input class="btn btn-danger"  type="submit" value="Eliminar">
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

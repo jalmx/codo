@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block title %} {{title}} {% endblock%}
+
+{% block main %}
+
+<div class="row container-fluid">
+    {% for commission in commissions %}
+    <div class="col">
+        {% include "card_commission.html" with key=commission%}
+    </div>        
+    {% endfor %}
+    {% for commission in commissions %}
+    <div class="col">
+        {% include "card_commission.html" with key=commission%}
+    </div>        
+    {% endfor %}
+    {% for commission in commissions %}
+    <div class="col">
+        {% include "card_commission.html" with key=commission%}
+    </div>        
+    {% endfor %}
+    {% for commission in commissions %}
+    <div class="col">
+        {% include "card_commission.html" with key=commission%}
+    </div>        
+    {% endfor %}
+</div>
+
+
+{% endblock %}

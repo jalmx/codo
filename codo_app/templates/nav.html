@@ -1,0 +1,32 @@
+{% load static %}
+
+<nav class="navbar bg-body-tertiary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">
+      <img src="{% static 'logo.svg' %}" alt="Logo" width="30" height="24"
+        class="d-inline-block align-text-top">
+      CODO - Comisiones Docentes
+    </a>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/">Home</a>
+        </li>
+      </ul>
+    </div>
+    <div class="d-flex">
+      {% comment %} <div class="pe-4">
+        <form class="d-flex" role="search">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+      </div> {% endcomment %}
+      <div class=" justify-content-start">
+        <a id="btn_load_teachers" class="btn btn-secondary me-2" type="button" href="/docentes" >Docentes</a>
+        <button  id="btn_load_commission" class="btn btn-success" href="/comision"  type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">Cargar Comisión</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+{% include "modal_add_commission.html" %}
