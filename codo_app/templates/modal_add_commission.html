@@ -1,26 +1,34 @@
-  <!-- Modal -->
-  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Crear nueva carga de comisión</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Crear nueva carga de comisión</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="/comision" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
         <div class="modal-body">
-            <label for="name comition">Nombre de la comisión
-                <input type="text" placeholder="Comisión de junta de academia">
-            </label>
-            <label for="folio">Folio:
-                <input type="text" placeholder="220">
-            </label>
-            <label for="date">
-                <span>20-02-2024</span>
-            </label>
+          <div class="mb-3">
+            <label for="name commission" class="form-label">Nombre de la comisión</label>
+            <input type="text" class="form-control" id="name commission" name="name-commission" placeholder="Comisión: Junta de academia" required />
+          </div>
+          <div class="mb-3">
+            <label for="folio" class="form-label">Folio:</label>
+            <input type="text" class="form-control" id="folio" name="foliate" placeholder="Folio base, ejemplo: 228"  required/>
+          </div>
+
+          <div class="mb-3">
+            <label for="add pdf" class="form-label">Agregar el pdf con todas las comisiones</label>
+            <input type="file" class="form-control" id="add pdf" accept=".pdf" name="add_pdf" />
+          </div>
+
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="button" class="btn btn-primary">Crear</button>
+          <input type="submit" class="btn btn-primary" value="Crear" />
         </div>
-      </div>
+      </form>
     </div>
   </div>
+</div>

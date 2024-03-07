@@ -7,12 +7,13 @@ from datetime import datetime
 class Commissions(models.Model):
     """ Model for commissions Model
     """
-    _id_commissions = models.AutoField(primary_key=True,
+    id_commissions = models.AutoField(primary_key=True,
                                        unique=True,
                                        null=False)
     name = models.CharField(max_length=255, null=False)
     date = models.DateTimeField(default=datetime.today, null=False)
     foliate_commission = models.CharField(max_length=20, null=False, blank=False)
+    pdf_master = models.FileField(null=False, blank=False, upload_to="uploads")
 
     def __str__(self) -> str:
         return f"{self.name} : {self.foliate_commission}"
@@ -22,7 +23,7 @@ class Teachers(models.Model):
     """ Model for teacher Model
     """
 
-    _id_teacher = models.AutoField(primary_key=True, null=False, unique=True)
+    id_teacher = models.AutoField(primary_key=True, null=False, unique=True)
     name = models.CharField(max_length=20, unique=True, null=False)
     email1 = models.EmailField(max_length=20, unique=True, null=False)
     email2 = models.EmailField(max_length=20,
@@ -39,16 +40,19 @@ STATUS = [("S", "sended"), ("F", "fail"), ("P", "pending")]
 
 class Commission(models.Model):
 
+    id_commission = models.AutoField(primary_key=True, null=False, unique=True)
     status = models.CharField(max_length=1,
                               null=False,
                               choices=STATUS,
                               default="P")
     foliate_teacher = models.CharField(max_length=20, null=False, unique=True)
     # path_pdf = models.FilePathField(null=False, unique=True, blank=True)
-    path_pdf = models.CharField(max_length=100,
+    path_pdf = models.FileField(max_length=100,
                                 null=False,
                                 unique=True,
-                                blank=True)
+                                blank=True,
+                                upload_to="files")
+    
     _id_teacher = models.ForeignKey(Teachers, on_delete=models.CASCADE)
     _id_commission = models.ForeignKey(Commissions, on_delete=models.CASCADE)
 

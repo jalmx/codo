@@ -3,7 +3,11 @@ from django.template import RequestContext
 from django.http import HttpResponse
 from django.shortcuts import render
 from . import models
-
+from django.core.files.storage import FileSystemStorage
+import uuid
+from datetime import datetime
+from django.conf import settings
+from os import path, makedirs
 # Create your views here.
 
 
@@ -27,7 +31,7 @@ def home_teacher(request, data=None):
         teacher = models.Teachers.objects.get(email1=email)
         context["teacher"] = teacher
     elif request.POST.get("update"):
-        # TODO: agregar la secuencia de actualizacion del docente
+        # TODO: agregar la secuencia de actualización del docente
         pass
 
     teachers = models.Teachers.objects.all()
@@ -67,3 +71,35 @@ def delete_teacher(request):
         return redirect("/docentes/")
     except:
         return redirect("/docentes/", error="error_delete")
+
+def create_commission(request):
+
+    if request.method == "POST":
+        
+        name_commission = request.POST["name-commission"]
+        foliate_commission = request.POST["foliate"]
+
+        pdf = request.FILES["add_pdf"]
+
+        fs = FileSystemStorage()
+
+        name_new_pdf = f"{pdf.name.replace('.pdf','')}_{uuid.uuid4()}.pdf"
+        pdf_name = fs.save(name_new_pdf, pdf)
+
+        url = fs.url(pdf_name)
+
+        teachers = []
+        context ={"title": "Creando Comisión",
+            "name": name_commission, "foliate": foliate_commission,
+            "file_path": url, "teachers": teachers}
+
+        models.Commissions.objects.create(name=name_commission, foliate_commission=foliate_commission, pdf_master=url, date=str(datetime.now()))
+        
+       
+        path_files =  path.join(settings.MEDIA_ROOT,name_new_pdf)
+
+        makedirs(path_files.replace(".pdf",""), exist_ok=True)
+
+        return render(request=request, template_name="commissions.html", context=context)
+    
+    return redirect("/")

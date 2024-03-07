@@ -4,28 +4,21 @@
 
 {% block main %}
 
-<div class="row container-fluid">
+{% if commissions%}
+<div class="row container-fluid ">
     {% for commission in commissions %}
     <div class="col">
-        {% include "card_commission.html" with key=commission%}
-    </div>        
-    {% endfor %}
-    {% for commission in commissions %}
-    <div class="col">
-        {% include "card_commission.html" with key=commission%}
-    </div>        
-    {% endfor %}
-    {% for commission in commissions %}
-    <div class="col">
-        {% include "card_commission.html" with key=commission%}
-    </div>        
-    {% endfor %}
-    {% for commission in commissions %}
-    <div class="col">
-        {% include "card_commission.html" with key=commission%}
-    </div>        
+        {% include "card_commission.html" with key=commission %}
+    </div>
     {% endfor %}
 </div>
+
+{% else %}
+<h2 class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+    Sin cargar de comisiones
+</h2>
+{% endif %}
+
 
 
 {% endblock %}
