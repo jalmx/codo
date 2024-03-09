@@ -46,7 +46,7 @@ class Commission(models.Model):
                               choices=STATUS,
                               default="P")
     foliate_teacher = models.CharField(max_length=20, null=False, unique=True)
-    # path_pdf = models.FilePathField(null=False, unique=True, blank=True)
+    status = models.BooleanField(default=False)
     path_pdf = models.FileField(max_length=100,
                                 null=False,
                                 unique=True,

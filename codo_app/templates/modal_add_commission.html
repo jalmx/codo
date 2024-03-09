@@ -15,12 +15,12 @@
           </div>
           <div class="mb-3">
             <label for="folio" class="form-label">Folio:</label>
-            <input type="text" class="form-control" id="folio" name="foliate" placeholder="Folio base, ejemplo: 228"  required/>
+            <input type="number" class="form-control" id="folio" name="foliate" placeholder="220" style="-webkit-appearance: none;  -moz-appearance: textfield;" pattern="\d*" min="1" required/>
           </div>
 
           <div class="mb-3">
             <label for="add pdf" class="form-label">Agregar el pdf con todas las comisiones</label>
-            <input type="file" class="form-control" id="add pdf" accept=".pdf" name="add_pdf" />
+            <input type="file" class="form-control" required id="add pdf" accept=".pdf" name="add_pdf" />
           </div>
 
         </div>

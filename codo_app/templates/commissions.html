@@ -7,14 +7,13 @@
 
 {% block main %}
 
-<a href="{{file_path}}">ver doc</a>
-
   <div class="col">
     <div class="row">
       <h1>Comisión: {{ name }} - Folio: {{ foliate }}</h1>
     </div>
   </div>
 <div class="col d-flex justify-content-end">
+    <a class="btn btn-outline-info mx-2" href="{{file_path}}">Ver Comisión base</a>
     <a class="btn btn-info" href="/">Enviar todos</a>
 </div>
   <section class="col">
@@ -26,12 +25,11 @@
           <th scope="col">Folio docente</th>
           <th scope="col">Correo principal</th>
           <th scope="col">Correo secundario</th>
-          {% comment %} TODO: Agregar las Opciones, no se si con js o en backend {% endcomment %}
-          {% comment %} <th scope="col">Opciones</th> {% endcomment %}
+          <th scope="col">Opciones</th>
         </tr>
       </thead>
       <tbody>
-        {% for teache in teachers %}
+        {% for teacher in teachers %}
           <tr>
             <th scope="row">{{ forloop.counter }}</th>
             <td class="text-nowrap">{{ teacher.name }}</td>
@@ -42,8 +40,11 @@
             {% else %}
               <td class="text-nowrap"></td>
             {% endif %}
-            {% comment %} <td class="text-nowrap">
-              <form action="/docentes/" method="post" style="display: inline;">
+            <td class="text-nowrap">
+              <div>
+                <a class="btn btn-outline-info" href="/file/comision_6_cc4778a4-e043-4d6e-9a8f-e7c4213a40b5.pdf" target="_blank">Ver comisión</a>
+              </div>
+              {% comment %} <form action="/docentes/" method="post" style="display: inline;">
                 {% csrf_token %}
                 <input type="text" hidden value="{{ teacher.email1 }}" name="edit" />
                 <input class="btn btn-warning" type="submit" value="Editar" />
@@ -51,8 +52,8 @@
               <form action="/delete" method="post" style="display: inline;">
                 {% csrf_token %}
                 <input type="text" hidden value="{{ teacher.email1 }}" name="delete" />
-                <input class="btn btn-danger" type="submit" value="Eliminar" />
-              </form> {% endcomment %}
+                <input class="btn btn-danger" type="submit" value="Eliminar" /> {% endcomment %}
+              </form>
             </td>
           </tr>
         {% endfor %}

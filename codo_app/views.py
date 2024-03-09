@@ -8,8 +8,8 @@ import uuid
 from datetime import datetime
 from django.conf import settings
 from os import path, makedirs
-from .util.read_pdf import ReadPDF
-from .util.split_pdf import split
+from .util.read_pdf import ReadDataPDF
+
 # Create your views here.
 
 
@@ -39,30 +39,26 @@ def home_teacher(request, data=None):
     teachers = models.Teachers.objects.all()
 
     context["teachers"] = teachers
-    return render(request=request,
-                  template_name="teacher.html",
-                  context=context)
+    return render(request=request, template_name="teacher.html", context=context)
 
 
 def register_teacher(request):
+
     context = {"title": "Registro Docente"}
     try:
         name_teacher = request.POST["name_teacher"].upper()
         email_main = request.POST["email_main"].upper()
         email_second = request.POST["email_second"].upper() or None
 
-        models.Teachers.objects.create(name=name_teacher,
-                                       email1=email_main,
-                                       email2=email_second)
+        models.Teachers.objects.create(
+            name=name_teacher, email1=email_main, email2=email_second
+        )
 
         return redirect("/docentes", context=context)
     except Exception as e:
         print(f"Error al insertar: {e}")
 
-        return redirect("/docentes",
-                        error="register",
-                        context=context,
-                        status_code=503)
+        return redirect("/docentes", error="register", context=context, status_code=503)
 
 
 def delete_teacher(request):
@@ -74,10 +70,38 @@ def delete_teacher(request):
     except:
         return redirect("/docentes/", error="error_delete")
 
+
+def load_teachers(request):
+    if request.method == "POST":
+        csv_file = request.FILES["file_csv"]
+
+        content = csv_file.read().decode("utf-8")
+
+        rows = content.split("\n")
+        teachers = []
+        for i, row in enumerate(rows[1:]):
+            columns = row.strip().split(",")
+
+            if len(columns) > 1:
+                name = columns[0].upper()
+                email1 = columns[1].lower()
+                email2 = columns[2].lower() or None
+
+                teachers.append(
+                    models.Teachers(name=name, email1=email1, email2=email2)
+                )
+        try:
+            if len(teachers) > 0:
+                models.Teachers.objects.bulk_create(teachers)
+        except:
+            pass
+    return redirect("/docentes/")
+
+
 def create_commission(request):
 
     if request.method == "POST":
-        
+
         name_commission = request.POST["name-commission"]
         foliate_commission = request.POST["foliate"]
 
@@ -90,18 +114,39 @@ def create_commission(request):
 
         url = fs.url(pdf_name)
 
-        teachers = []
-        context ={"title": "Creando Comisión",
-            "name": name_commission, "foliate": foliate_commission,
-            "file_path": url, "teachers": teachers}
+        context = {
+            "title": "Creando Comisión",
+            "name": name_commission,
+            "foliate": foliate_commission,
+            "file_path": url,
+        }
 
-        models.Commissions.objects.create(name=name_commission, foliate_commission=foliate_commission, pdf_master=url, date=str(datetime.now()))
+        models.Commissions.objects.create(
+            name=name_commission,
+            foliate_commission=foliate_commission,
+            pdf_master=url,
+            date=str(datetime.now()),
+        )
+
+        path_pdf_saved = path.join(settings.MEDIA_ROOT, name_new_pdf)
+
+        content_pdf = ReadDataPDF(path_pdf_saved)
+        data_teachers = content_pdf.get_data()
         
-       
-        path_files =  path.join(settings.MEDIA_ROOT,name_new_pdf)
+        path_files = path.join(settings.MEDIA_ROOT, name_new_pdf)
+        
+        data_files = content_pdf.split(
+            path_pdf_saved,
+            path.join(settings.MEDIA_ROOT, path_files.replace(".pdf", "")),
+        )
+        # print(f"data teachers : {data_teachers}")
+        print(data_files)
+        context["teachers"] = data_teachers
 
-        makedirs(path_files.replace(".pdf",""), exist_ok=True)
+        
 
-        return render(request=request, template_name="commissions.html", context=context)
-    
+        return render(
+            request=request, template_name="commissions.html", context=context
+        )
+
     return redirect("/")
