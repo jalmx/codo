@@ -1,5 +1,7 @@
 from os import makedirs
-from PyPDF2 import PdfReader
+from os.path import join, basename
+from PyPDF2 import PdfReader, PdfWriter
+from uuid import uuid4
 
 
 def _get_name_folder(name_file: str) -> str:
@@ -11,11 +13,40 @@ def _get_name_folder(name_file: str) -> str:
     Returns:
         str: name clear
     """
-    return name_file.replace(".pdf", "")
+    return basename(name_file).replace(".pdf", "")
 
 
-def _save_pdf(name: str, dist: str):
-    pass
+def _save_pdf(path_pdf: str, path_dist: str, split: int):
+    """Save all pdf files in a folder
+
+    Args:
+        path_pdf (str): Path pdf file with all commissions
+        path_dist (str): Destination to save all commissions
+        split (int): count of pages for each file
+    """
+    
+    pdf = PdfReader(path_pdf).pages
+    count = 0
+    total_pages = len(pdf)
+
+    if _is_not_all(pdf):
+        total_pages -= 1
+    
+
+    while total_pages > count:
+        count_inside = 0
+        writer = PdfWriter()
+        print(f"saving pdf {count}")
+
+        while count_inside < split:
+            writer.add_page(pdf[count])
+            count_inside += 1
+            count += 1
+
+        with open(
+            join(path_dist, f"{_get_name_folder(path_pdf)}_{uuid4()}.pdf"), mode="wb"
+        ) as f:
+            writer.write(f)
 
 
 def _is_not_all(pdf: list) -> bool:
@@ -56,10 +87,7 @@ def _is_one(pdf: list) -> bool:
 
 def _get_number_to_split(pdf: list) -> int:
     n_split = 1
-    total_pages = len(pdf)
-
-    if _is_not_all(pdf):
-        total_pages -= 1
+   
 
     if _is_one(pdf):
         return n_split
@@ -70,17 +98,27 @@ def _get_number_to_split(pdf: list) -> int:
 def split(path_pdf: str, path_dist: str | None = None):
     pdf = PdfReader(path_pdf).pages
 
-    folder_name = _get_name_folder(path_pdf)
+    folder_name = path_dist or _get_name_folder(path_pdf)
 
     print(f"name folder: {folder_name}")
 
-    _get_number_to_split(pdf)
+    c = _get_number_to_split(pdf)
+
+    makedirs(folder_name, exist_ok=True)
+
+    _save_pdf(path_pdf, path_dist=folder_name, split=c)
 
 
 if __name__ == "__main__":
-    path_file = ["comision_1.pdf", "./comision_2.pdf", "./comision_3.pdf"]
+    path_file = [
+        "comision_1.pdf",
+        "comision_2.pdf",
+        "comision_3.pdf",
+        "comision_4.pdf",
+        "comision_5.pdf",
+        "comision_6.pdf",
+    ]
 
     for p in path_file:
         split(p)
         print("----------------------")
-        # break
