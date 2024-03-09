@@ -11,7 +11,7 @@ class Commissions(models.Model):
                                        unique=True,
                                        null=False)
     name = models.CharField(max_length=255, null=False)
-    date = models.DateTimeField(default=datetime.today, null=False)
+    date = models.DateTimeField(default=datetime.today,  null=False, editable=False)
     foliate_commission = models.CharField(max_length=20, null=False, blank=False)
     pdf_master = models.FileField(null=False, blank=False, upload_to="uploads")
 
