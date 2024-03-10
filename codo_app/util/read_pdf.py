@@ -20,7 +20,7 @@ class ReadDataPDF:
                     foliate = (
                         line[position + len(token) :].replace(" ", "").replace(".", "")
                     )
-                    return foliate
+                    return foliate.strip()
 
         return None
 
@@ -119,8 +119,8 @@ class ReadDataPDF:
 
                 if not name:
                     content = pdf[count].extract_text().split("\n")
-                    name = self._get_name_person(content).replace(" ", "_") or None
-                    foliate = self._get_foliate(content).replace("/", "_") or None
+                    name = self._get_name_person(content) or None
+                    foliate = self._get_foliate(content) or None
 
                 writer.add_page(pdf[count])
                 count_inside += 1
@@ -131,7 +131,7 @@ class ReadDataPDF:
 
             # print(f" name person for document: {name } - {foliate}")
             path_to_save = join(
-                path_dist, f"{self._get_name_folder(path_pdf)}_{name}_{foliate}.pdf"
+                path_dist, f"{self._get_name_folder(path_pdf)}_{name.replace(' ', '_')}_{foliate.replace('/', '_')}.pdf"
             )
 
             # print(f"path to save: {path_to_save}")

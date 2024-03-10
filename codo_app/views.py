@@ -12,8 +12,14 @@ from .util.read_pdf import ReadDataPDF
 
 # Create your views here.
 
+def create_teacher_ghost():
+    try:
+        models.Teachers.objects.create(name="UNKNOWN", email1="email@email.com", email2="email@email.com")
+    except:
+        pass
 
 def index(request):
+    create_teacher_ghost()
     context = {"title": "CODO"}
     commissions = models.Commissions.objects.all()
     context["commissions"] = commissions
@@ -83,9 +89,9 @@ def load_teachers(request):
             columns = row.strip().split(",")
 
             if len(columns) > 1:
-                name = columns[0].upper()
-                email1 = columns[1].lower()
-                email2 = columns[2].lower() or None
+                name = columns[0].upper().strip()
+                email1 = columns[1].lower().strip()
+                email2 = columns[2].lower().strip() or None
 
                 teachers.append(
                     models.Teachers(name=name, email1=email1, email2=email2)
@@ -97,6 +103,53 @@ def load_teachers(request):
             pass
     return redirect("/docentes/")
 
+
+def add_path_uri(data_dict: list):
+
+    for data in data_dict:
+        
+        data["uri"] = data.get("path_file").replace(str(settings.MEDIA_ROOT), "/file")
+
+    return data_dict
+
+def add_data(data_dict :list,commission_main): 
+    
+    for t in data_dict:
+        try:
+            teacher = models.Teachers.objects.get(name=t["name"])
+            t["id_teacher"] = teacher
+            t["email1"]= teacher.email1
+            t["email2"]= teacher.email2 or None
+            t["exist"] = True 
+        except:
+            t["id_teacher"] = models.Teachers.objects.get(name="UNKNOWN")
+            t["exist"] = False
+        finally:
+            t["status"] = "p"
+            t["id_commission"] = commission_main
+    
+    return data_dict
+
+
+def create_bulk_commissions(data_commission_list:list):
+
+    for commission in data_commission_list:
+        create_register_commission_one(commission)
+
+    return True
+
+def create_register_commission_one(data_commission:dict):
+    print(f"comssion a registrar: {data_commission}")
+    commission = models.Commission.objects.create(
+        status= data_commission["status"],
+        foliate_teacher = data_commission["foliate"],
+        uri=data_commission["uri"],
+        path_pdf=data_commission["path_file"],
+        id_commission= data_commission["id_commission"],
+        id_teacher=data_commission["id_teacher"]
+    )
+
+    return commission
 
 def create_commission(request):
 
@@ -118,32 +171,34 @@ def create_commission(request):
             "title": "Creando Comisión",
             "name": name_commission,
             "foliate": foliate_commission,
-            "file_path": url,
+            "file_path_base": url,
         }
 
-        models.Commissions.objects.create(
+        commission =models.Commissions.objects.create(
             name=name_commission,
             foliate_commission=foliate_commission,
             pdf_master=url,
             date=str(datetime.now()),
         )
-
+              
         path_pdf_saved = path.join(settings.MEDIA_ROOT, name_new_pdf)
 
         content_pdf = ReadDataPDF(path_pdf_saved)
-        data_teachers = content_pdf.get_data()
-        
+        content_pdf.get_data()
+
         path_files = path.join(settings.MEDIA_ROOT, name_new_pdf)
-        
+
         data_files = content_pdf.split(
             path_pdf_saved,
             path.join(settings.MEDIA_ROOT, path_files.replace(".pdf", "")),
         )
-        # print(f"data teachers : {data_teachers}")
-        print(data_files)
-        context["teachers"] = data_teachers
 
-        
+        data_files = add_path_uri(data_files)
+        data_files = add_data(data_files, commission)
+
+        create_bulk_commissions(data_files)
+
+        context["teachers"] = data_files
 
         return render(
             request=request, template_name="commissions.html", context=context

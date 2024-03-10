@@ -13,11 +13,11 @@
     </div>
   </div>
 <div class="col d-flex justify-content-end">
-    <a class="btn btn-outline-info mx-2" href="{{file_path}}">Ver Comisión base</a>
+    <a class="btn btn-outline-info mx-2" href="{{file_path_base}}" target="_blank">Ver Comisión base</a>
     <a class="btn btn-info" href="/">Enviar todos</a>
 </div>
   <section class="col">
-    <table class="table">
+    <table class="table table-stripe table-hover table-striped-columns">
       <thead>
         <tr>
           <th scope="col">#</th>
@@ -30,7 +30,12 @@
       </thead>
       <tbody>
         {% for teacher in teachers %}
-          <tr>
+          {% if teacher.exist %}
+            <tr>
+          {% else %}
+          <tr class="table-danger">
+          {% endif %}
+         
             <th scope="row">{{ forloop.counter }}</th>
             <td class="text-nowrap">{{ teacher.name }}</td>
             <td class="text-nowrap">{{ teacher.foliate }}</td>
@@ -42,7 +47,7 @@
             {% endif %}
             <td class="text-nowrap">
               <div>
-                <a class="btn btn-outline-info" href="/file/comision_6_cc4778a4-e043-4d6e-9a8f-e7c4213a40b5.pdf" target="_blank">Ver comisión</a>
+                <a class="btn btn-outline-info" href="{{teacher.uri}}" target="_blank">Ver comisión</a>
               </div>
               {% comment %} <form action="/docentes/" method="post" style="display: inline;">
                 {% csrf_token %}

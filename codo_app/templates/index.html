@@ -14,9 +14,13 @@
 </div>
 
 {% else %}
-<h2 class="d-flex justify-content-center align-items-center" style="height: 100vh;">
-    Sin cargar de comisiones
-</h2>
+<div class="row container-fluid ">
+    <div class="d-flex flex-column justify-content-center align-items-center" style="height: 100vh;">
+        <h2>Sin cargar de comisiones</h2>
+        <a id="btn_load_teachers" class="btn btn-block btn-danger me-2" style="text-transform: uppercase;" type="button" href="/docentes" >Carga Docentes</a>
+    </div>
+</div>
+
 {% endif %}
 
 

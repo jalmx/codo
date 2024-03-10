@@ -44,7 +44,7 @@
             </thead>
             <tbody class="table-group-divider">
                 {% for teacher in teachers %}
-                <tr>
+                 <tr>
                     <td class="text-nowrap">{{forloop.counter}}</td>
                     <td class="text-nowrap">{{teacher.name}}</td>
                     <td class="text-nowrap">{{teacher.email1}}</td>
@@ -54,16 +54,16 @@
                     <td class="text-nowrap"></td>
                     {% endif %}
                     <td class="text-nowrap">
-                        <form action="/docentes/" method="post" style="display: inline;">{% csrf_token %}
-                            <input type="text" hidden value="{{teacher.email1}}" name="edit">
-                            <input class="btn btn-warning"  type="submit" value="Editar">
-                        </form>
-                        <form action="/delete" method="post" style="display: inline;">{% csrf_token %}
-                            <input type="text" hidden value="{{teacher.email1}}" name="delete">
-                            <input class="btn btn-danger"  type="submit" value="Eliminar">
-                        </form>
-                    </td>
-                </tr>
+                            <form action="/docentes/" method="post" style="display: inline;">{% csrf_token %}
+                                <input type="text" hidden value="{{teacher.email1}}" name="edit">
+                                <input class="btn btn-warning"  type="submit" value="Editar">
+                            </form>
+                            <form action="/delete" method="post" style="display: inline;">{% csrf_token %}
+                                <input type="text" hidden value="{{teacher.email1}}" name="delete">
+                                <input class="btn btn-danger"  type="submit" value="Eliminar">
+                            </form>
+                        </td>
+                    </tr>
                 {% endfor %}
             </tbody>
         </table>
