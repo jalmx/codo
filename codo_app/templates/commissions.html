@@ -14,7 +14,11 @@
   </div>
 <div class="col d-flex justify-content-end">
     <a class="btn btn-outline-info mx-2" href="{{file_path_base}}" target="_blank">Ver Comisión base</a>
-    <a class="btn btn-info" href="/">Enviar todos</a>
+    <form action="/send_bulk" method="post">{% csrf_token %}
+      <input type="text" hidden name="id_commission" value="{{id_commissions}}">
+      <input  class="btn btn-info" type="submit" value="Enviar todos">
+    </form>
+    
 </div>
   <section class="col">
     <table class="table table-stripe table-hover table-striped-columns">

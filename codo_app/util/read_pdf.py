@@ -6,10 +6,10 @@ from uuid import uuid4
 
 class ReadDataPDF:
 
-    def __init__(self, path_pdf: str | None = None):
+    def __init__(self, path_pdf = None):
         self.path_pdf = path_pdf
 
-    def _get_foliate(self, content: str) -> str | None:
+    def _get_foliate(self, content: str) -> str:
 
         token = "Oficio número"
 
@@ -17,14 +17,13 @@ class ReadDataPDF:
             if len(line.strip()):
                 position = line.find(token)
                 if position != -1:
-                    foliate = (
-                        line[position + len(token) :].replace(" ", "").replace(".", "")
-                    )
+                    foliate = (line[position + len(token):].replace(
+                        " ", "").replace(".", ""))
                     return foliate.strip()
 
         return None
 
-    def _get_name_person(self, content: list) -> str | None:
+    def _get_name_person(self, content: list) -> str :
         token = "Coatzacoalcos".upper()
 
         for i in range(len(content)):
@@ -106,8 +105,7 @@ class ReadDataPDF:
         if self._is_not_all(pdf):
             total_pages -= 1
 
-        information =[]
-        
+        information = []
 
         while total_pages > count:
             count_inside = 0
@@ -131,23 +129,21 @@ class ReadDataPDF:
 
             # print(f" name person for document: {name } - {foliate}")
             path_to_save = join(
-                path_dist, f"{self._get_name_folder(path_pdf)}_{name.replace(' ', '_')}_{foliate.replace('/', '_')}.pdf"
+                path_dist,
+                f"{self._get_name_folder(path_pdf)}_{name.replace(' ', '_')}_{foliate.replace('/', '_')}.pdf"
             )
 
             # print(f"path to save: {path_to_save}")
             with open(path_to_save, mode="wb") as f:
                 writer.write(f)
 
-            information.append(
-                {
-                    "path_file": path_to_save,
-                    "name":name,
-                    "foliate": foliate
-                }
-            )
-            
+            information.append({
+                "path_file": path_to_save,
+                "name": name,
+                "foliate": foliate
+            })
+
         return information
-    
 
     def _is_one(self, pdf: list) -> bool:
 
@@ -170,7 +166,7 @@ class ReadDataPDF:
         else:
             return n_split + 1
 
-    def split(self, path_pdf: str | None = None, path_dist: str | None = None):
+    def split(self, path_pdf: str  = None, path_dist: str  = None):
         path_pdf = path_pdf or self.path_pdf
 
         pdf = PdfReader(path_pdf).pages
@@ -179,11 +175,11 @@ class ReadDataPDF:
 
         # print(f"name folder: {folder_name}")
 
-        c = self._get_number_to_split(pdf)
+        number_to_split = self._get_number_to_split(pdf)
 
         makedirs(folder_name, exist_ok=True)
 
-        return self._save_pdf(path_pdf, path_dist=folder_name, split=c)
+        return self._save_pdf(path_pdf, path_dist=folder_name, split=number_to_split)
 
 
 if __name__ == "__main__":
@@ -202,4 +198,4 @@ if __name__ == "__main__":
 
         print(datas.get_data())
         print(datas.split())
-        break
+        

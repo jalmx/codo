@@ -9,4 +9,5 @@ urlpatterns = [
     path("delete", views.delete_teacher),
     path("comision", views.create_commission),
     path("load_teachers", views.load_teachers),
+    path("send_bulk", views.send_bulk),
 ]

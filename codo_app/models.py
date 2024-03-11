@@ -50,7 +50,7 @@ class Commission(models.Model):
     path_pdf = models.CharField(max_length=100, null=False, unique=True, blank=True)
 
     id_teacher = models.ForeignKey(Teachers, on_delete=models.CASCADE)
-    id_commission = models.ForeignKey(Commissions, on_delete=models.CASCADE)
+    id_commissions = models.ForeignKey(Commissions, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
-        return f"status: {self.status}; foliate teacher: {self.foliate_teacher}; Teacher: {self.id_teacher}; id commission: {self.id_commission}; path: {self.path_pdf}"
+        return f"status: {self.status}; foliate teacher: {self.foliate_teacher}; Teacher: {self.id_teacher}; id commission: {self.id_commissions}; path: {self.path_pdf}"
