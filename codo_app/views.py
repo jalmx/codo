@@ -164,18 +164,23 @@ def create_register_commission_one(data_commission: dict):
 
     return commission
 
+def send_emails(data):
+
+    for commission in data:
+        pass
+
+
 @csrf_exempt
 def send_bulk(request):
 
     if request.method == "POST":
-        
+
         id_commission = request.POST.get("id_commission")
-        
+
         if id_commission:
-            print(f"El id commission es: {id_commission}")
-            commissions_to_send = models.Commission.objects.all().filter(id_commissions= id_commission)
-            for cm in commissions_to_send:
-                print(cm) 
+            commissions_to_send = models.Commission.objects.all().filter(
+                id_commissions=id_commission)
+            send_emails(commissions_to_send)
 
     return redirect("/")
 
