@@ -10,18 +10,17 @@ from django.conf import settings
 from os import path
 from .util.read_pdf import ReadDataPDF
 from django.views.decorators.csrf import csrf_exempt
-
+from util.send_email import send_mail
 # Create your views here.
 
 
 def create_teacher_ghost():
-    """Function to create a register for elements no register in database
-    """
+    """Function to create a register for elements no register in database"""
 
     try:
-        models.Teachers.objects.create(name="UNKNOWN",
-                                       email1="email@email.com",
-                                       email2="email@email.com")
+        models.Teachers.objects.create(
+            name="UNKNOWN", email1="email@email.com", email2="email@email.com"
+        )
     except:
         pass
 
@@ -53,9 +52,7 @@ def home_teacher(request, data=None):
     teachers = models.Teachers.objects.all()
 
     context["teachers"] = teachers
-    return render(request=request,
-                  template_name="teacher.html",
-                  context=context)
+    return render(request=request, template_name="teacher.html", context=context)
 
 
 def register_teacher(request):
@@ -66,18 +63,15 @@ def register_teacher(request):
         email_main = request.POST["email_main"].upper()
         email_second = request.POST["email_second"].upper() or None
 
-        models.Teachers.objects.create(name=name_teacher,
-                                       email1=email_main,
-                                       email2=email_second)
+        models.Teachers.objects.create(
+            name=name_teacher, email1=email_main, email2=email_second
+        )
 
         return redirect("/docentes", context=context)
     except Exception as e:
         print(f"Error al insertar: {e}")
 
-        return redirect("/docentes",
-                        error="register",
-                        context=context,
-                        status_code=503)
+        return redirect("/docentes", error="register", context=context, status_code=503)
 
 
 def delete_teacher(request):
@@ -107,7 +101,8 @@ def load_teachers(request):
                 email2 = columns[2].lower().strip() or None
 
                 teachers.append(
-                    models.Teachers(name=name, email1=email1, email2=email2))
+                    models.Teachers(name=name, email1=email1, email2=email2)
+                )
         try:
             if len(teachers) > 0:
                 models.Teachers.objects.bulk_create(teachers)
@@ -119,8 +114,7 @@ def load_teachers(request):
 def add_path_uri(data_dict: list):
 
     for data in data_dict:
-        data["uri"] = data.get("path_file").replace(str(settings.MEDIA_ROOT),
-                                                    "/file")
+        data["uri"] = data.get("path_file").replace(str(settings.MEDIA_ROOT), "/file")
 
     return data_dict
 
@@ -160,18 +154,17 @@ def create_register_commission_one(data_commission: dict):
         uri=data_commission["uri"],
         path_pdf=data_commission["path_file"],
         id_commissions=data_commission["id_commission"],
-        id_teacher=data_commission["id_teacher"])
+        id_teacher=data_commission["id_teacher"],
+    )
 
     return commission
-
-def send_emails(data):
-
-    for commission in data:
-        pass
 
 
 @csrf_exempt
 def send_bulk(request):
+
+    def update_commission():
+        models.Commission.objects.all().get()
 
     if request.method == "POST":
 
@@ -179,8 +172,10 @@ def send_bulk(request):
 
         if id_commission:
             commissions_to_send = models.Commission.objects.all().filter(
-                id_commissions=id_commission)
-            send_emails(commissions_to_send)
+                id_commissions=id_commission
+            )
+            # TODO: aqui meter un subproceso o un hilo
+            send_mail(commissions_to_send)
 
     return redirect("/")
 
@@ -241,8 +236,8 @@ def create_commission(request):
         # print(data_files)
         # print("=" * 80)
 
-        return render(request=request,
-                      template_name="commissions.html",
-                      context=context)
+        return render(
+            request=request, template_name="commissions.html", context=context
+        )
 
     return redirect("/")
