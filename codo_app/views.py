@@ -9,7 +9,7 @@ from datetime import datetime
 from django.conf import settings
 from os import path
 from .util.read_pdf import ReadDataPDF
-from django.views.decorators.csrf import csrf_exempt
+from .util.send_email import send_bulk_email
 
 # Create your views here.
 
@@ -164,14 +164,12 @@ def create_register_commission_one(data_commission: dict):
 
     return commission
 
-def send_emails(data):
 
-    for commission in data:
-        pass
-
-
-@csrf_exempt
 def send_bulk(request):
+
+    def update(commissions, status):
+        commissions["status"] = status
+        commissions.save()
 
     if request.method == "POST":
 
@@ -180,7 +178,8 @@ def send_bulk(request):
         if id_commission:
             commissions_to_send = models.Commission.objects.all().filter(
                 id_commissions=id_commission)
-            send_emails(commissions_to_send)
+            
+            send_bulk_email(commissions_to_send, update)
 
     return redirect("/")
 

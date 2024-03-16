@@ -12,7 +12,7 @@
       <h1>Comisión: {{ name }} - Folio: {{ foliate }}</h1>
     </div>
   </div>
-<div class="col d-flex justify-content-end">
+<div class="col d-flex justify-content-end my-2">
     <a class="btn btn-outline-info mx-2" href="{{file_path_base}}" target="_blank">Ver Comisión base</a>
     <form action="/send_bulk" method="post">{% csrf_token %}
       <input type="text" hidden name="id_commission" value="{{id_commissions}}">
