@@ -2,6 +2,13 @@ from django.shortcuts import render, redirect
 from django.template import RequestContext
 from django.http import HttpResponse
 from django.shortcuts import render
+
+from codo_app.util.helper_views import (
+    add_data_teacher,
+    add_path_uri,
+    create_bulk_commissions,
+    create_teacher_ghost,
+)
 from . import models
 from django.core.files.storage import FileSystemStorage
 import uuid
@@ -11,23 +18,23 @@ from os import path
 from .util.read_pdf import ReadDataPDF
 from django.views.decorators.csrf import csrf_exempt
 from .util.send_email import send_bulk_email
+import threading
 
 # Create your views here.
 
 
-def create_teacher_ghost():
-    """Function to create a register for elements no register in database"""
-
-    try:
-        models.Teachers.objects.create(name="UNKNOWN",
-                                       email1="email@email.com",
-                                       email2="email@email.com")
-    except:
-        pass
-
-
 def index(request):
     create_teacher_ghost()
+
+    if request.method == "GET" and request.GET.get("delete"):
+        id = request.GET.get("delete")
+        try:
+            commission = models.Commissions.objects.get(id_commissions=id)
+            # TODO: Eliminar la carpeta y el pdf
+            commission.delete()
+        except:
+            print("El id de la comisión no existe")
+
     context = {"title": "CODO"}
     commissions = models.Commissions.objects.all()
     context["commissions"] = commissions
@@ -53,9 +60,7 @@ def home_teacher(request, data=None):
     teachers = models.Teachers.objects.all()
 
     context["teachers"] = teachers
-    return render(request=request,
-                  template_name="teacher.html",
-                  context=context)
+    return render(request=request, template_name="teacher.html", context=context)
 
 
 def register_teacher(request):
@@ -66,18 +71,15 @@ def register_teacher(request):
         email_main = request.POST["email_main"].upper()
         email_second = request.POST["email_second"].upper() or None
 
-        models.Teachers.objects.create(name=name_teacher,
-                                       email1=email_main,
-                                       email2=email_second)
+        models.Teachers.objects.create(
+            name=name_teacher, email1=email_main, email2=email_second
+        )
 
         return redirect("/docentes", context=context)
     except Exception as e:
         print(f"Error al insertar: {e}")
 
-        return redirect("/docentes",
-                        error="register",
-                        context=context,
-                        status_code=503)
+        return redirect("/docentes", error="register", context=context, status_code=503)
 
 
 def delete_teacher(request):
@@ -107,7 +109,8 @@ def load_teachers(request):
                 email2 = columns[2].lower().strip() or None
 
                 teachers.append(
-                    models.Teachers(name=name, email1=email1, email2=email2))
+                    models.Teachers(name=name, email1=email1, email2=email2)
+                )
         try:
             if len(teachers) > 0:
                 models.Teachers.objects.bulk_create(teachers)
@@ -116,60 +119,10 @@ def load_teachers(request):
     return redirect("/docentes/")
 
 
-def add_path_uri(data_dict: list):
-
-    for data in data_dict:
-        data["uri"] = data.get("path_file").replace(str(settings.MEDIA_ROOT),
-                                                    "/file")
-
-    return data_dict
-
-
-def add_data(data_dict: list, commission_main):
-
-    for teacher in data_dict:
-        try:
-            teacher_model = models.Teachers.objects.get(name=teacher["name"])
-            teacher["id_teacher"] = teacher_model
-            teacher["email1"] = teacher_model.email1
-            teacher["email2"] = teacher_model.email2 or None
-            teacher["exist"] = True
-        except:
-            teacher["id_teacher"] = models.Teachers.objects.get(name="UNKNOWN")
-            teacher["exist"] = False
-        finally:
-            teacher["status"] = "p"
-            teacher["id_commission"] = commission_main
-
-    return data_dict
-
-
-def create_bulk_commissions(data_commission_list: list):
-
-    for commission in data_commission_list:
-        create_register_commission_one(commission)
-
-    return True
-
-
-def create_register_commission_one(data_commission: dict):
-    # print(f"comssion a registrar: {data_commission}")
-    commission = models.Commission.objects.create(
-        status=data_commission["status"],
-        foliate_teacher=data_commission["foliate"],
-        uri=data_commission["uri"],
-        path_pdf=data_commission["path_file"],
-        id_commissions=data_commission["id_commission"],
-        id_teacher=data_commission["id_teacher"],
-    )
-
-    return commission
-
-
 def send_bulk(request):
 
     def update(commissions, status):
-        commissions["status"] = status
+        commissions.status = status
         commissions.save()
 
     if request.method == "POST":
@@ -178,14 +131,69 @@ def send_bulk(request):
 
         if id_commission:
             commissions_to_send = models.Commission.objects.all().filter(
-                id_commissions=id_commission)
-
-            send_bulk_email(commissions_to_send, update)
+                id_commissions=id_commission
+            )
+            threading.Thread(
+                target=send_bulk_email,
+                name=f"Sending emails id commission: {id_commission}",
+                args=(
+                    commissions_to_send,
+                    update,
+                ),
+            ).start()
+            # send_bulk_email(commissions_to_send, update)
 
     return redirect("/")
 
 
 def create_commission(request):
+
+    if request.method == "GET" and request.GET.get("commission"):
+        id = request.GET.get("commission")
+        commissions_main = models.Commissions.objects.all().get(id_commissions=id)
+        commissions = models.Commission.objects.all().filter(
+            id_commissions=commissions_main.id_commissions
+        )
+        teachers = []
+        context = {
+            "title": "Comisión",
+            "name": commissions_main.name,
+            "foliate": commissions_main.foliate_commission,
+            "file_path_base": commissions_main.pdf_master.name,
+            "id_commissions": commissions_main.id_commissions,
+            "status": commissions_main.status,
+        }
+        for commission in commissions:
+            if commission.id_teacher.name != "UNKNOWN":
+                teachers.append(
+                    {
+                        "status": commission.status,
+                        "foliate_teacher": commission.foliate_teacher,
+                        "uri": commission.uri,
+                        "name": commission.id_teacher.name,
+                        "email1": (
+                            commission.id_teacher.email1
+                            if commission.id_teacher.email1 != "email@email.com"
+                            else ""
+                        ),
+                        "email2": (
+                            commission.id_teacher.email2
+                            if commission.id_teacher.email2 != "email@email.com"
+                            else ""
+                        ),
+                        "exist": (
+                            True
+                            if commission.id_teacher.email1 != "email@email.com"
+                            else False
+                        ),
+                    }
+                )
+
+        context["teachers"] = teachers
+
+        return render(
+            request=request, template_name="commissions.html", context=context
+        )
 
     if request.method == "POST":
 
@@ -230,19 +238,46 @@ def create_commission(request):
         # print("Comision id: ", commission.id_commissions)
 
         data_files = add_path_uri(data_files)
-        data_files = add_data(data_files, commission)
+        data_files = add_data_teacher(data_files, commission)
 
         create_bulk_commissions(data_files)
 
         context["teachers"] = data_files
         context["id_commissions"] = commission.id_commissions
+        context["status"] = "C"
 
         # print("=" * 80)
         # print(data_files)
         # print("=" * 80)
 
-        return render(request=request,
-                      template_name="commissions.html",
-                      context=context)
+        return render(
+            request=request, template_name="commissions.html", context=context
+        )
 
     return redirect("/")
+
+
+def register_email(request):
+    """Function to save, delete and get emails from host
+
+    Args:
+        request (Request): _description_
+
+    Returns:
+        _type_: template html with context from db emails
+    """
+    ctx = {}
+    if request.method == "POST":
+        if request.POST.get("email") and request.POST.get("password"):
+            email = request.POST.get("email")
+            pwd = request.POST.get("password")
+            models.EmailBase.objects.create(email=email.strip(), password=pwd.strip())
+        elif request.POST.get("id"):
+            id = request.POST.get("id")
+            print("el id a eliminar", id)
+            models.EmailBase.objects.all().get(id=int(id)).delete()
+            
+    emails = models.EmailBase.objects.all()
+    ctx["emails"] = emails
+
+    return render(request=request, template_name="register_email.html", context=ctx)

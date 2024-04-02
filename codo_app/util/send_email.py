@@ -1,13 +1,9 @@
-from django.core.mail import send_mail, send_mass_mail, EmailMessage
+from django.core.mail import get_connection, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from time import sleep
+from codo_app.util.log import *
+from codo_app.util.load_email import get_emails, get_reply_to
 from ..models import Teachers, Commission, Commissions
-
-EMAIL_BOT_LIST = [{
-    "email1": "docentes.1@cbtis085.edu.mx",
-    "pwd": "kBu>757RC*0v>X",
-    "reply_to": "jalmx89@gmail.com"
-}]
 
 
 def _build_body(data: dict):
@@ -18,15 +14,18 @@ def _build_body(data: dict):
     return html
 
 
-def send_email_one(one_data: dict):
+def send_email_one(one_data: dict, connection=None):
+    print("enviar el correo a: ", get_emails())
 
-    email = EmailMessage(
-        one_data["subject"],
-        one_data["body"],
-        one_data["from_email"],
-        one_data["to_emails"],  # is a list emails
-        reply_to=one_data["reply_to"],
-        fail_silently=False)
+    email = EmailMultiAlternatives(
+        subject=f'Comisión: {one_data["name commission"]} - {one_data["date"]}',
+        from_email=get_emails()[0]["email"],
+        to=one_data["emails"],  # is a list emails
+        reply_to=get_reply_to(),
+        connection=connection,
+    )
+
+    email.attach_alternative(_build_body(one_data), "text/html")
 
     email.attach_file(one_data["path_pdf"])
     return email
@@ -34,10 +33,15 @@ def send_email_one(one_data: dict):
 
 def _get_data_teacher(teacher: Teachers):
 
+    emails = [teacher.email1]
+
+    emails.append(teacher.email2) if teacher.email2 else ""
+
     return {
         "name": teacher.name,
         "email1": teacher.email1,
-        "email2": teacher.email2 or None
+        "email2": teacher.email2 or None,
+        "emails": emails,
     }
 
 
@@ -46,57 +50,62 @@ def _get_data_commissions(commission: Commissions):
     return {
         "name commission": commission.name,
         "date": commission.date,
-        "status": commission.status
+        "status": commission.status,
     }
 
 
 def _get_data_commission(commission: Commission):
     return {
         "foliate_teacher": commission.foliate_teacher,
-        "path_pdf": commission.path_pdf
+        "path_pdf": commission.path_pdf,
     }
 
 
 def send_bulk_email(data: list[Commission], cb_update):
     # print("----------------------")
     # print(data.values())
-    print("----------------------")
+    # print("----------------------")
 
-    print(data.first().id_commission)
+    print("El id de la comision main: ", data.first().id_commissions)
+    l(__name__, "El id de la comision main: ", data.first().id_commissions)
 
     for one in data:
         # print("----------------------")
         # print("Tipo de one", type(one))
         # print(one)
         # print("----------------------")
+        
         info = {}
         info.update(_get_data_commission(one))
         info.update(_get_data_teacher(one.id_teacher))
         info.update(_get_data_commissions(one.id_commissions))
-
-        print("---------------------")
-        print("info", info)
-        print("---------------------")
+        
+        if info["email1"] == "email@email.com":
+            l(__name__, f"No sended to {info} | because no have a email valid", type=W)
+            cb_update(data.first().id_commissions, "F")
+            continue
+        # print("---------------------")
+        # print("info", info)
+        # print("---------------------")
 
         try:
-            emails = [info["email1"]]
-            if info["email2"]:
-                emails.append(info["email2"])
+            with get_connection(
+                password=get_emails()[0]["pwd"],
+                username=get_emails()[0]["email"],
+                fail_silently=False,
+            ) as connection:
+                send_email_one(info, connection).send(fail_silently=False)
 
-            send_email_one({
-                "subject":
-                f'Comisión: {info["name commission"]} - {info["date"]}',
-                "body": _build_body(info),
-                "from_email": [EMAIL_BOT_LIST[0]["email1"]],
-                "to_emails": emails,
-                "reply_to": [EMAIL_BOT_LIST[0]["reply_to"]]
-            })
+                print(f'Enviando el correo a {info.get("email1")}')
+                l(__name__, f'Enviando el correo a {info.get("email1")}')
+                one.status = "s"
+                one.save()
 
-            one["status"] = "s"
-            one.save()
-            sleep(1)
-            break
+                sleep(1)
+
         except Exception as e:
-            cb_update(data[0].id_commissions, "F")
-            print(f"Fail to send email: {one}\n--->Error:{e}")
-    cb_update(data[0].id_commissions, "D")
+            cb_update(data.first().id_commissions, "F")
+            print(f"Fail to send email: {info}\n--->Error:{e}")
+            l(__name__, f"Fail to send email: {info}\n--->Error:{e}", type=E)
+
+    cb_update(data.first().id_commissions, "D")

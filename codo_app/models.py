@@ -54,3 +54,9 @@ class Commission(models.Model):
 
     def __str__(self) -> str:
         return f"status: {self.status}; foliate teacher: {self.foliate_teacher}; Teacher: {self.id_teacher}; id commission: {self.id_commissions}; path: {self.path_pdf}"
+
+
+class EmailBase(models.Model):
+    id = models.AutoField(primary_key=True, unique=True, null=False)
+    email = models.EmailField(unique=True, null=False)
+    password = models.CharField(max_length=255, null=False)

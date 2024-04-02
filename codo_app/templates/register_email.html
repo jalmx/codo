@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+
+{% block title %} {{title}} {% endblock%}
+
+{% block main %}
+
+
+<div class="container">
+
+    <h2>Registro de correos</h2>
+    <p>
+        De estos correos se enviaran los correos
+    </p>
+    <p>
+        El primer correo es el que se toma por default
+    </p>
+    <div class="row">
+
+        <form class="col-sm-12 col-md-4 border p-4" method="POST" action="/emails">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="email" class="form-label">Correo:</label>
+                <input type="email" class="form-control" placeholder="nombre@correo.com" id="email" name="email" required />
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Contraseña</label>
+                <input type="password" class="form-control" placeholder="password" id="password" name="password" required />
+            </div>
+            <input type="submit" class="btn btn-primary" value="Agregar" />
+        </form>
+
+        <div class="col-sm-12 col-md-8 overflow-x-auto">
+            <table class="table table-stripe table-hover table-striped-columns">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Correo</th>
+                        <th scope="col">Opciones</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    {% for email in emails %}
+                    <tr>
+                        <td class="text-nowrap">{{forloop.counter}}</td>
+                        <td class="text-nowrap">{{email.email}}</td>
+                        <td class="text-nowrap">
+                            <form action="/emails" method="post" style="display: inline;">{% csrf_token %}
+                                <input type="text" hidden value="{{email.id}}" name="id">
+                                <input class="btn btn-danger" type="submit" value="Eliminar">
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+
+{% endblock %}
+

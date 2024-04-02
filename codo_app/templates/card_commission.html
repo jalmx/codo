@@ -5,14 +5,23 @@
       Fecha: {{ commission.date }} <span>Folio: {{ commission.foliate_commission }}</span>
     </p>
     <div class="d-flex my-2">
-      <span class="badge text-bg-warning">En progreso</span>
-      <span class="badge text-bg-info">Creada</span>
-      <span class="badge text-bg-success">Enviada</span>
-    </div>
 
+      {% if commission.status == "C" or commission.status == "c" %}
+      
+      <span class="badge text-bg-info">Creada</span>
+
+      {% elif commission.status == "p" or commission.status == "P" %}
+      <span class="badge text-bg-warning">En progreso</span>
+
+      {% elif commission.status == "D" or commission.status == "d" %}
+
+        <span class="badge text-bg-success">Enviada</span>
+      {% endif %}
+
+    </div>
     <div class="btn-group d-flex justify-content-end" role="group">
-      <a href="#" class="btn btn-danger">Borrar</a>
-      <a href="#" class="btn btn-primary">Ver</a>
+      <a href="?delete={{ commission.id_commissions }}" class="btn btn-danger">Borrar</a>
+      <a href="/comision?commission={{ commission.id_commissions }}" class="btn btn-primary">Ver</a>
     </div>
   </div>
 </div>
