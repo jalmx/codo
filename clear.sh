@@ -1,3 +1,3 @@
 #!/bin/bash
 
-rm -rf db.sqlite3 codo_app/migrations uploads
+rm -rf db.sqlite3 codo_app/migrations uploads *.log

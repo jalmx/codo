@@ -30,9 +30,11 @@ class Teachers(models.Model):
     """Model for teacher Model"""
 
     id_teacher = models.AutoField(primary_key=True, null=False, unique=True)
-    name = models.CharField(max_length=20, unique=True, null=False)
-    email1 = models.EmailField(max_length=20, unique=True, null=False)
-    email2 = models.EmailField(max_length=20, unique=True, blank=True, null=True)
+    name = models.CharField(max_length=20, null=False)
+    email1 = models.EmailField(max_length=20, null=False)
+    email2 = models.EmailField(
+        max_length=20, blank=True, null=True, default=""
+    )
 
     def __str__(self) -> str:
         return f"id {self.id_teacher} {self.name} : {self.email1} : {self.email2 if self.email2 else ''}"

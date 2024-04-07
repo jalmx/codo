@@ -1,83 +1,85 @@
 {% extends 'layout.html' %}
 
 {% block title %}
-  {{ title }}
+{{ title }}
 {% endblock %}
 
 
 {% block main %}
 
-  <div class="col">
-    <div class="row">
-      <h1>Comisión: {{ name }} - Folio: {{ foliate }}</h1>
-      {% if status == "C" or status == "c" %}
-      
-      <span class="badge text-bg-info">Creada</span>
+<div class="col">
+  <div class="row">
+    <h1>Comisión: {{ name }} - Folio: {{ foliate }}</h1>
+    {% if status == "C" or status == "c" %}
 
-      {% elif status == "p" or status == "P" %}
-      <span class="badge text-bg-warning">En progreso</span>
+    <span class="badge text-bg-info">Creada</span>
 
-      {% elif status == "D" or status == "d" %}
+    {% elif status == "p" or status == "P" %}
+    <span class="badge text-bg-warning">En progreso</span>
 
-        <span class="badge text-bg-success">Enviada</span>
-      {% endif %}
-    </div>
+    {% elif status == "D" or status == "d" %}
+
+    <span class="badge text-bg-success">Enviada</span>
+    {% endif %}
   </div>
-<div class="col d-flex justify-content-end my-2">
-    <a class="btn btn-outline-info mx-2" href="{{file_path_base}}" target="_blank">Ver Comisión base</a>
-    <form action="/send_bulk" method="post">{% csrf_token %}
-      <input type="text" hidden name="id_commission" value="{{id_commissions}}">
-      <input  class="btn btn-info" type="submit" value="Enviar todos">
-    </form>
-    
 </div>
-  <section class="col">
-    <table class="table table-stripe table-hover table-striped-columns">
-      <thead>
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Nombre docente</th>
-          <th scope="col">Folio docente</th>
-          <th scope="col">Correo principal</th>
-          <th scope="col">Correo secundario</th>
-          <th scope="col">Opciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for teacher in teachers %}
-          {% if teacher.exist %}
-            <tr>
+<div class="col d-flex justify-content-end my-2">
+  <a class="btn btn-outline-info mx-2" href="{{file_path_base}}" target="_blank">Ver Comisión base</a>
+  <form action="/send_bulk" method="post">{% csrf_token %}
+    <input type="text" hidden name="id_commission" value="{{id_commissions}}">
+    <input class="btn btn-info" type="submit" value="Enviar todos">
+  </form>
+
+</div>
+<section class="col">
+  <table class="table table-stripe table-hover table-striped-columns">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Nombre docente</th>
+        <th scope="col">Folio docente</th>
+        <th scope="col">Correo principal</th>
+        <th scope="col">Correo secundario</th>
+        <th scope="col">Estatus</th>
+        <th scope="col">Opciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for teacher in teachers %}
+      {% if teacher.exist %}
+      <tr>
+        {% else %}
+      <tr class="table-danger">
+        {% endif %}
+
+        <th scope="row">{{ forloop.counter }}</th>
+        <td class="text-nowrap">{{ teacher.name }}</td>
+        <td class="text-nowrap">{{ teacher.foliate }}</td>
+        <td class="text-nowrap">{{ teacher.email1 }}</td>
+        {% if teacher.email2 %}
+          <td class="text-nowrap">{{ teacher.email2 }}</td>
+        {% else %}
+          <td class="text-nowrap"></td>
+        {% endif %}
+        <td class="text-nowrap">
+          {% if teacher.status == "p" %}
+            <span class="badge text-bg-info">Pendiente</span>
+          {% elif teacher.status == "s" %}
+            <span class="badge text-bg-success">Enviado</span>
+          {% elif teacher.status == "f" %}
+            <span class="badge text-bg-danger">Fallo</span>
           {% else %}
-          <tr class="table-danger">
-          {% endif %}
-         
-            <th scope="row">{{ forloop.counter }}</th>
-            <td class="text-nowrap">{{ teacher.name }}</td>
-            <td class="text-nowrap">{{ teacher.foliate }}</td>
-            <td class="text-nowrap">{{ teacher.email1 }}</td>
-            {% if teacher.email2 %}
-              <td class="text-nowrap">{{ teacher.email2 }}</td>
-            {% else %}
-              <td class="text-nowrap"></td>
-            {% endif %}
-            <td class="text-nowrap">
-              <div>
-                <a class="btn btn-outline-info" href="{{teacher.uri}}" target="_blank">Ver comisión</a>
-              </div>
-              {% comment %} <form action="/docentes/" method="post" style="display: inline;">
-                {% csrf_token %}
-                <input type="text" hidden value="{{ teacher.email1 }}" name="edit" />
-                <input class="btn btn-warning" type="submit" value="Editar" />
-              </form>
-              <form action="/delete" method="post" style="display: inline;">
-                {% csrf_token %}
-                <input type="text" hidden value="{{ teacher.email1 }}" name="delete" />
-                <input class="btn btn-danger" type="submit" value="Eliminar" /> {% endcomment %}
-              </form>
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </section>
+            <span class="badge text-bg-warning">Desconocido</span>
+          {% endif %} 
+        </td>
+        <td class="text-nowrap">
+          <div>
+            <a class="btn btn-outline-info" href="{{teacher.uri}}" target="_blank">Ver comisión</a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
 {% endblock %}

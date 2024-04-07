@@ -1,11 +1,8 @@
 <h2>Registro Docente</h2>
-{% if teacher %}
-<form class="col-sm-12 col-md-6 col-lg-4 col-xl-4 border" method="POST" action="/update">
-    {% csrf_token %} {% else %}
-    <form class="col-sm-12 col-md-6 col-lg-4 col-xl-4 border" method="POST" action="/registerTeacher">
-
-        {% csrf_token %} {% endif %}
+    <form class="col-sm-12 col-md-6 col-lg-4 col-xl-4 border p-4" method="POST" action="/registerTeacher">
+    {% csrf_token %} 
         <div class="mb-3">
+            <input type="text" hidden id="id teacher" name="id" value="{{teacher.id_teacher}}" >
             <label for="name_teacher" class="form-label">Nombre completo</label>
             <input type="text" class="form-control" id="name_teacher" name="name_teacher" required
                 placeholder="Nombre completo comenzando por apellidos" value="{{teacher.name}}"
@@ -13,15 +10,24 @@
         </div>
         <div class="mb-3">
             <label for="email_main" class="form-label">correo principal</label>
-            <input type="email" class="form-control" placeholder="nombre@correo.com" value="{{teacher.email1}}"
-                id="email_main" name="email_main" required />
+            <input type="email" class="form-control" placeholder="nombre@correo.com" value="{{teacher.email1}}" id="email_main" name="email_main" required />
         </div>
         <div class="mb-3">
             <label fo_="email_second" class="form-label">correo secundario</label>
+            {% if teacher.email2 %}
             <input type="email" class="form-control" placeholder="nombre2@correo.com" value="{{teacher.email2}}"
                 name="email_second" id="email_second" />
+            {% else %}
+            <input type="email" class="form-control" placeholder="nombre2@correo.com" value=""
+            name="email_second" id="email_second" />
+            {% endif %}
         </div>
-        {% comment %} TODO: cambiar el contenido del boton y la accion para actualizar los datos {% endcomment %}
-        <input type="submit" class="btn btn-primary" value="Agregar" />
-    </form>
+        
+        {% if teacher.name %}
+            <input type="text" hidden name="update" value="update">
+            <input type="submit" class="btn btn-success" value="Actualizar" />
+        {% else %}
+        <input type="text" hidden name="add" value="add">
+            <input type="submit" class="btn btn-primary" value="Agregar" />
+        {% endif %}
 </form>
