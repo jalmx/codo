@@ -57,7 +57,7 @@ def home_teacher(request, data=None):
         teacher = models.Teachers.objects.get(email1=email)
         context["teacher"] = teacher
 
-    teachers = models.Teachers.objects.all()
+    teachers = models.Teachers.objects.all().exclude(name="UNKNOWN")
 
     context["teachers"] = teachers
     return render(request=request, template_name="teacher.html", context=context)
@@ -76,7 +76,7 @@ def register_teacher(request):
             print(request.POST)
             print("----------------")
             if id:
-                old_teacher = models.Teachers.objects.get(email1=email_main)
+                old_teacher = models.Teachers.objects.get(id_teacher=id)
                 print("-----------------")
                 print(old_teacher)
                 print("-----------------")
@@ -130,8 +130,7 @@ def load_teachers(request):
                 name = columns[0].upper().strip()
                 email1 = columns[1].lower().strip()
                 email2 = columns[2].lower().strip() or None
-                # TODO: No cargar al UNKNOWN
-                # TODO: al volver a cargar en el home, cargar a todos, menos al UNKNOWN
+                
                 teachers.append(
                     models.Teachers(name=name, email1=email1, email2=email2)
                 )
