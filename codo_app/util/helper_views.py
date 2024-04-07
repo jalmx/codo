@@ -1,6 +1,8 @@
 from django.conf import settings
 
 from codo_app import models
+from codo_app.util.log import l
+
 
 def add_path_uri(data_dict: list):
 
@@ -18,12 +20,13 @@ def add_data_teacher(data_dict: list, commission_main):
             teacher["id_teacher"] = teacher_model
             teacher["email1"] = teacher_model.email1
             teacher["email2"] = teacher_model.email2 or None
+            teacher["status"] = "p"
             teacher["exist"] = True
         except:
             teacher["id_teacher"] = models.Teachers.objects.get(name="UNKNOWN")
             teacher["exist"] = False
+            teacher["status"] = "f"
         finally:
-            teacher["status"] = "p"
             teacher["id_commission"] = commission_main
 
     return data_dict
@@ -38,7 +41,7 @@ def create_bulk_commissions(data_commission_list: list):
 
 
 def create_register_commission_one(data_commission: dict):
-    # print(f"comssion a registrar: {data_commission}")
+
     commission = models.Commission.objects.create(
         status=data_commission["status"],
         foliate_teacher=data_commission["foliate"],
@@ -50,12 +53,17 @@ def create_register_commission_one(data_commission: dict):
 
     return commission
 
+
 def create_teacher_ghost():
     """Function to create a register for elements no register in database"""
 
     try:
+        models.Teachers.objects.get(id_teacher=1)
+        print("Getting UNKNOWN")
+        l(__name__, "Getting UNKNOWN")
+    except:
         models.Teachers.objects.create(
             name="UNKNOWN", email1="email@email.com", email2="email@email.com"
         )
-    except:
-        pass
+        print("Creating UNKNOWN")
+        l(__name__, "Creating UNKNOWN")

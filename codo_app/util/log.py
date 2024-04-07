@@ -13,11 +13,11 @@ W = "warning"
 E = "error"
 
 
-def l(file:str,message: str, type=I):
+def l(file: str, message: str, type=I, error=None):
     if type == W:
         logging.warning(f"{file}: {message} {datetime.datetime.now()}")
-    elif type == "E":
-        logging.error(f"{file}: {message} {datetime.datetime.now()}")
+    elif type == E:
+        logging.error(f"{file}: {message} {datetime.datetime.now()} - Error: {error}")
     elif type == I:
         logging.info(f"{file}: {message} {datetime.datetime.now()}")
     else:
