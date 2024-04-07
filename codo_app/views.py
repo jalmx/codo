@@ -143,7 +143,7 @@ def load_teachers(request):
 
 
 def send_bulk(request):
-    # TODO: actualizar la commission main en su status de en progreso cuando se esta enviando
+
     def update(commissions, status):
         commissions.status = status
         commissions.save()
@@ -152,7 +152,13 @@ def send_bulk(request):
 
         id_commission = request.POST.get("id_commission")
 
+        print(f"El id es: {id_commission}")
+        l(__name__,f"Comenzando a enviar la comisión id: {id_commission}")
         if id_commission:
+            commission_main = models.Commissions.objects.all().get(id_commissions=id_commission)
+            commission_main.status = "p"
+            commission_main.save()
+            
             commissions_to_send = models.Commission.objects.all().filter(
                 id_commissions=id_commission
             )

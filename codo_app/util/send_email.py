@@ -66,8 +66,8 @@ def send_bulk_email(data: list[Commission], cb_update):
     # print(data.values())
     # print("----------------------")
 
-    print("El id de la comision main: ", data.first().id_commissions)
-    l(__name__, "El id de la comision main: ", data.first().id_commissions)
+    print("El id de la comisión main: ", data.first().id_commissions)
+    l(__name__, "El id de la comisión main: ", data.first().id_commissions)
 
     for one in data:
         # print("----------------------")

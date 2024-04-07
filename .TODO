@@ -1,6 +1,0 @@
-# TODO
-
-- quitar el correo dummy del frontend, desde el backend
-- Evitar que envie el correo al correo 
-- Evitar que al recargar me quite los registros que no tiene correo valido
-- Colocar a un lado del correo el estado del correo, en el listado general, su badgess
