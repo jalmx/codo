@@ -1,23 +1,22 @@
+import threading
+import uuid
+from os import path
+
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render, redirect
 
-from codo.settings import BASE_DIR
 from codo_app.util.helper_views import (
     add_data_teacher,
     add_path_uri,
     create_bulk_commissions,
-    create_teacher_ghost,
+    create_teacher_ghost, delete_commission, load_teachers_from_csv,
 )
-from codo_app.util.util import delete_files
+from codo_app.util.log import *
 from . import models
-from django.core.files.storage import FileSystemStorage
-import uuid
-import datetime
-from django.conf import settings
-from os import path
 from .util.read_pdf import ReadDataPDF
 from .util.send_email import send_bulk_email
-import threading
-from codo_app.util.log import *
+
 
 # Create your views here.
 
@@ -27,21 +26,7 @@ def index(request):
 
     if request.method == "GET" and request.GET.get("delete"):
         id = request.GET.get("delete")
-        try:
-            commission = models.Commissions.objects.get(id_commissions=id)
-            name = commission.pdf_master.name.split(path.sep)[-1]
-            name_pdf = path.join(BASE_DIR, "uploads", name)
-            name_folder = name_pdf.replace(".pdf", "")
-            delete_files(path_folder=name_folder, path_pdf=name_pdf)
-            commission.delete()
-        except Exception as e:
-            l(
-                __name__,
-                message=f"El id de la comisión no existe: {id}",
-                type=E,
-                error=e,
-            )
-            print(f"El id de la comisión no existe: {id}")
+        delete_commission(id)
 
     context = {"title": "CODO"}
     commissions = models.Commissions.objects.all()
@@ -122,28 +107,14 @@ def load_teachers(request):
         content = csv_file.read().decode("utf-8")
 
         rows = content.split("\n")
-        teachers = []
-        for i, row in enumerate(rows[1:]):
-            columns = row.strip().split(",")
+        ok = load_teachers_from_csv(rows)
+        if not ok:
+            return redirect("/docentes/#fail")
 
-            if len(columns) > 1:
-                name = columns[0].upper().strip()
-                email1 = columns[1].lower().strip()
-                email2 = columns[2].lower().strip() or None
-                
-                teachers.append(
-                    models.Teachers(name=name, email1=email1, email2=email2)
-                )
-        try:
-            if len(teachers) > 0:
-                models.Teachers.objects.bulk_create(teachers)
-        except:
-            pass
     return redirect("/docentes/")
 
 
 def send_bulk(request):
-
     def update(commissions, status):
         commissions.status = status
         commissions.save()
@@ -153,12 +124,12 @@ def send_bulk(request):
         id_commission = request.POST.get("id_commission")
 
         print(f"El id es: {id_commission}")
-        l(__name__,f"Comenzando a enviar la comisión id: {id_commission}")
+        l(__name__, f"Comenzando a enviar la comisión id: {id_commission}")
         if id_commission:
             commission_main = models.Commissions.objects.all().get(id_commissions=id_commission)
             commission_main.status = "p"
             commission_main.save()
-            
+
             commissions_to_send = models.Commission.objects.all().filter(
                 id_commissions=id_commission
             )
@@ -175,7 +146,6 @@ def send_bulk(request):
 
 
 def create_commission(request):
-
     if request.method == "GET" and request.GET.get("commission"):
         id = request.GET.get("commission")
         commissions_main = models.Commissions.objects.all().get(id_commissions=id)
@@ -230,7 +200,6 @@ def create_commission(request):
         )
 
     if request.method == "POST":
-
         name_commission = request.POST["name-commission"]
         foliate_commission = request.POST["foliate"]
 
@@ -238,7 +207,7 @@ def create_commission(request):
 
         fs = FileSystemStorage()
 
-        name_new_pdf = f"{pdf.name.replace('.pdf','')}_{uuid.uuid4()}.pdf"
+        name_new_pdf = f"{pdf.name.replace('.pdf', '')}_{uuid.uuid4()}.pdf"
         pdf_name = fs.save(name_new_pdf, pdf)
 
         url = fs.url(pdf_name)
@@ -269,20 +238,22 @@ def create_commission(request):
             path.join(settings.MEDIA_ROOT, path_files.replace(".pdf", "")),
         )
 
-        # print("Comision id: ", commission.id_commissions)
+        l(__name__, "Comision id created: ", commission.id_commissions)
 
         data_files = add_path_uri(data_files)
         data_files = add_data_teacher(data_files, commission)
 
-        create_bulk_commissions(data_files)
+        creation_ok = create_bulk_commissions(data_files)
 
         context["teachers"] = data_files
         context["id_commissions"] = commission.id_commissions
-        context["status"] = "c"
+        context["status"] = "c" if creation_ok else "f"
+
+        if not creation_ok:
+            delete_commission(commission.id_commissions)
 
         return render(
-            request=request, template_name="commissions.html", context=context
-        )
+            request=request, template_name="commissions.html", context=context)
 
     return redirect("/")
 

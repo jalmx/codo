@@ -2,7 +2,8 @@ from codo_app import models
 
 """ Function to get all emails who send emails
     """
-    
+
+
 def get_emails() -> list[dict[str:str]]:
     """Return a list of dict with email and password, from email host.
     To send all emails

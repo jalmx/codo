@@ -1,12 +1,13 @@
 from os import makedirs
 from os.path import join, basename
-from PyPDF2 import PdfReader, PdfWriter
 from uuid import uuid4
+
+from PyPDF2 import PdfReader, PdfWriter
 
 
 class ReadDataPDF:
 
-    def __init__(self, path_pdf = None):
+    def __init__(self, path_pdf=None):
         self.path_pdf = path_pdf
 
     def _get_foliate(self, content: str) -> str:
@@ -23,7 +24,7 @@ class ReadDataPDF:
 
         return None
 
-    def _get_name_person(self, content: list) -> str :
+    def _get_name_person(self, content: list) -> str:
         token = "Coatzacoalcos".upper()
 
         for i in range(len(content)):
@@ -166,7 +167,7 @@ class ReadDataPDF:
         else:
             return n_split + 1
 
-    def split(self, path_pdf: str  = None, path_dist: str  = None):
+    def split(self, path_pdf: str = None, path_dist: str = None):
         path_pdf = path_pdf or self.path_pdf
 
         pdf = PdfReader(path_pdf).pages
@@ -185,17 +186,17 @@ class ReadDataPDF:
 if __name__ == "__main__":
     path_file = [
         "comision_6.pdf",
-        "comision_1.pdf",
-        "comision_2.pdf",
-        "comision_3.pdf",
-        "comision_4.pdf",
-        "comision_5.pdf",
+        # "comision_1.pdf",
+        # "comision_2.pdf",
+        # "comision_3.pdf",
+        # "comision_4.pdf",
+        # "comision_5.pdf",
+        "comision_7.pdf"
     ]
 
     for file in path_file:
-
         datas = ReadDataPDF(file)
 
         print(datas.get_data())
         print(datas.split())
-        
+        print("*" * 40)

@@ -1,5 +1,5 @@
-import logging
 import datetime
+import logging
 
 logging.basicConfig(
     filename=f"codo_log{datetime.date.today()}.log",

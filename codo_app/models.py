@@ -47,7 +47,7 @@ class Commission(models.Model):
 
     id_commission = models.AutoField(primary_key=True, null=False, unique=True)
     status = models.CharField(max_length=1, null=False, choices=STATUS, default="P")
-    foliate_teacher = models.CharField(max_length=20, null=False, unique=True)
+    foliate_teacher = models.CharField(max_length=20, null=False, blank=False)
     uri = models.CharField(max_length=255, null=False, blank=False, unique=True)
     path_pdf = models.CharField(max_length=100, null=False, unique=True, blank=True)
 

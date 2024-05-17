@@ -1,13 +1,14 @@
+from time import sleep
+
 from django.core.mail import get_connection, EmailMultiAlternatives
 from django.template.loader import render_to_string
-from time import sleep
-from codo_app.util.log import *
+
 from codo_app.util.load_email import get_emails, get_reply_to
+from codo_app.util.log import *
 from ..models import Teachers, Commission, Commissions
 
 
 def _build_body(data: dict):
-
     html = render_to_string("correo.html", {"teacher": data})
 
     # print(html)
@@ -32,7 +33,6 @@ def send_email_one(one_data: dict, connection=None):
 
 
 def _get_data_teacher(teacher: Teachers):
-
     emails = [teacher.email1]
 
     emails.append(teacher.email2) if teacher.email2 else ""
@@ -46,7 +46,6 @@ def _get_data_teacher(teacher: Teachers):
 
 
 def _get_data_commissions(commission: Commissions):
-
     return {
         "name commission": commission.name,
         "date": commission.date,
@@ -74,12 +73,12 @@ def send_bulk_email(data: list[Commission], cb_update):
         # print("Tipo de one", type(one))
         # print(one)
         # print("----------------------")
-        
+
         info = {}
         info.update(_get_data_commission(one))
         info.update(_get_data_teacher(one.id_teacher))
         info.update(_get_data_commissions(one.id_commissions))
-        
+
         if info["email1"] == "email@email.com":
             l(__name__, f"No sended to {info} | because no have a email valid", type=W)
             cb_update(data.first().id_commissions, "F")
@@ -90,9 +89,9 @@ def send_bulk_email(data: list[Commission], cb_update):
 
         try:
             with get_connection(
-                password=get_emails()[0]["pwd"],
-                username=get_emails()[0]["email"],
-                fail_silently=False,
+                    password=get_emails()[0]["pwd"],
+                    username=get_emails()[0]["email"],
+                    fail_silently=False,
             ) as connection:
                 send_email_one(info, connection).send(fail_silently=False)
 

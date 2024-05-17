@@ -10,16 +10,23 @@
 <div class="col">
   <div class="row">
     <h1>Comisión: {{ name }} - Folio: {{ foliate }}</h1>
+
     {% if status == "C" or status == "c" %}
 
     <span class="badge text-bg-info">Creada</span>
 
     {% elif status == "p" or status == "P" %}
+
     <span class="badge text-bg-warning">En progreso</span>
 
     {% elif status == "D" or status == "d" %}
 
     <span class="badge text-bg-success">Enviada</span>
+
+     {% elif status == "F" or status == "f" %}
+
+     <span class="badge text-bg-danger">Fallo la creación de la comisión</span>
+
     {% endif %}
   </div>
 </div>
