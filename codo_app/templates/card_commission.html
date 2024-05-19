@@ -8,14 +8,20 @@
 
       {% if commission.status == "C" or commission.status == "c" %}
       
-      <span class="badge text-bg-info">Creada</span>
-
-      {% elif commission.status == "p" or commission.status == "P" %}
-      <span class="badge text-bg-warning">En progreso</span>
+        <span class="badge text-bg-info">Creada</span>
 
       {% elif commission.status == "D" or commission.status == "d" %}
 
         <span class="badge text-bg-success">Enviada</span>
+      
+      {% elif commission.status == "p" or commission.status == "P" %}
+        
+        <span class="badge text-bg-warning">En progreso</span>
+
+      {% else %}
+      
+      <span class="badge  text-bg-dark">Desconocido</span>
+
       {% endif %}
 
     </div>
