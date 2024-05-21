@@ -147,7 +147,10 @@ class ReadDataPDF:
         return information
 
     def _is_one(self, pdf: list) -> bool:
-
+        
+        if len(pdf) == len(self.data):
+            return True 
+                
         n_1 = len(pdf[0].extract_text().split())
         n_2 = len(pdf[1].extract_text().split())
         n_3 = len(pdf[2].extract_text().split())
@@ -185,13 +188,14 @@ class ReadDataPDF:
 
 if __name__ == "__main__":
     path_file = [
-        "comision_6.pdf",
+        # "comision_6.pdf",
         # "comision_1.pdf",
         # "comision_2.pdf",
         # "comision_3.pdf",
         # "comision_4.pdf",
         # "comision_5.pdf",
-        "comision_7.pdf"
+        # "comision_7.pdf",
+        "comision_8.pdf"
     ]
 
     for file in path_file:
