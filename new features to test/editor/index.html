@@ -6,76 +6,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <!-- Include Quill stylesheet -->
-    <link href="quill.snow.css" rel="stylesheet"/>
+    <link href="./quill.snow.css" rel="stylesheet" />
+
 </head>
 
 <body>
 
+    <div id="editor-ql" class="editor-ql">
+        <!-- Create the toolbar container -->
+        <div id="toolbar">
+            <button id="btn">Print</button>
+        </div>
 
+        <div id="toolbar-container">
+            <span class="ql-formats">
+                <select class="ql-font"></select>
+                <select class="ql-size"></select>
+            </span>
+            <span class="ql-formats">
+                <button class="ql-bold"></button>
+                <button class="ql-italic"></button>
+                <button class="ql-underline"></button>
+                <button class="ql-strike"></button>
+                <button class="ql-link"></button>
+            </span>
+            <span class="ql-formats">
+                <select class="ql-color"></select>
+                <select class="ql-background"></select>
+            </span>
+            <span class="ql-formats">
+                <button class="ql-script" value="sub"></button>
+                <button class="ql-script" value="super"></button>
+            </span>
+            <span class="ql-formats">
+                <button class="ql-header" value="1"></button>
+                <button class="ql-header" value="2"></button>
+                <button class="ql-header" value="3"></button>
+            </span>
+            <span class="ql-formats">
+                <button class="ql-list" value="ordered"></button>
+                <button class="ql-list" value="bullet"></button>
+                <button class="ql-indent" value="-1"></button>
+                <button class="ql-indent" value="+1"></button>
+            </span>
+            <span class="ql-formats">
+                <button class="ql-direction" value="rtl"></button>
+                <select class="ql-align"></select>
+            </span>
+            <span class="ql-formats">
+                <button class="ql-clean"></button>
+            </span>
+        </div>
+        <!-- Create the editor container -->
+        <div id="editor">
+        </div>
 
-    <!-- Create the toolbar container -->
-    <div id="toolbar">
-        <button id="btn">Print</button>
-    </div>
+        <div id="content" class="ql-editor contenedor">
 
-    <div id="toolbar-container">
-        <span class="ql-formats">
-            <select class="ql-font"></select>
-            <select class="ql-size"></select>
-        </span>
-        <span class="ql-formats">
-            <button class="ql-bold"></button>
-            <button class="ql-italic"></button>
-            <button class="ql-underline"></button>
-            <button class="ql-strike"></button>
-        </span>
-        <span class="ql-formats">
-            <select class="ql-color"></select>
-            <select class="ql-background"></select>
-        </span>
-        <span class="ql-formats">
-            <button class="ql-script" value="sub"></button>
-            <button class="ql-script" value="super"></button>
-        </span>
-        <span class="ql-formats">
-            <button class="ql-header" value="1"></button>
-            <button class="ql-header" value="2"></button>
-            <button class="ql-blockquote"></button>
-            <button class="ql-code-block"></button>
-        </span>
-        <span class="ql-formats">
-            <button class="ql-list" value="ordered"></button>
-            <button class="ql-list" value="bullet"></button>
-            <button class="ql-indent" value="-1"></button>
-            <button class="ql-indent" value="+1"></button>
-        </span>
-        <span class="ql-formats">
-            <button class="ql-direction" value="rtl"></button>
-            <select class="ql-align"></select>
-        </span>
-        <span class="ql-formats">
-            <button class="ql-link"></button>
-            <button class="ql-image"></button>
-            <button class="ql-video"></button>
-            <button class="ql-formula"></button>
-        </span>
-        <span class="ql-formats">
-            <button class="ql-clean"></button>
-        </span>
-    </div>
-    <!-- Create the editor container -->
-    <div id="editor">
-    </div>
-
-    <div id="content">
+        </div>
 
     </div>
     <!-- Include the Quill library -->
-    
-    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.0-rc.4/dist/quill.js"></script>
+    <script src="quill.js"></script>
+
+    <!-- <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script> -->
+
     <!-- Initialize Quill editor -->
     <script>
-        
+
         const quill = new Quill("#editor", {
             modules: {
                 toolbar: '#toolbar-container',
@@ -88,12 +86,10 @@
             console.log(quill.getContents())
             const text = quill.getSemanticHTML(0, quill.getLength())
             console.log(text)
-            content.innerHTML += text
+            content.innerHTML = text
         })
 
     </script>
-
-
 </body>
 
 </html>

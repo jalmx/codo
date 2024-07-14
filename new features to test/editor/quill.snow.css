@@ -1,10 +1,4 @@
-/*!
- * Quill Editor v2.0.0-rc.4
- * https://quilljs.com
- * Copyright (c) 2017-2024, Slab
- * Copyright (c) 2014, Jason Chen
- * Copyright (c) 2013, salesforce.com
- */
+
 .ql-container {
     box-sizing: border-box;
     font-family: Helvetica, Arial, sans-serif;
@@ -1286,4 +1280,7 @@
     border: 1px solid #ccc
 }
 
-/*# sourceMappingURL=quill.snow.css.map*/
+.contenedor p:empty {
+    background-color: tomato;
+    margin-bottom: 0.2rem;
+  }

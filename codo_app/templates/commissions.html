@@ -32,12 +32,16 @@
 </div>
 <div class="col d-flex justify-content-end my-2">
   <a class="btn btn-outline-info mx-2" href="{{file_path_base}}" target="_blank">Ver Comisión base</a>
-  <form action="/send_bulk" method="post">{% csrf_token %}
+  <form id="form" action="/send_bulk" method="post">{% csrf_token %}
     <input type="text" hidden name="id_commission" value="{{id_commissions}}">
+    <textarea id="text" style="display: none;" hidden aria-hidden="" name="message_to_email"></textarea>
+    <textarea id="text_json" style="display: none;" hidden aria-hidden="" name="message_to_email_json"></textarea>
     <input class="btn btn-info" type="submit" value="Enviar todos">
   </form>
 
 </div>
+{% include "editor.html" %}
+
 <section class="col">
   <table class="table table-stripe table-hover table-striped-columns">
     <thead>

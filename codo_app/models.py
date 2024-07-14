@@ -15,6 +15,8 @@ class Commissions(models.Model):
     date = models.DateTimeField(default=datetime.today, null=False, editable=False)
     foliate_commission = models.CharField(max_length=20, null=False, blank=False)
     pdf_master = models.FileField(null=False, blank=False, upload_to="uploads")
+    text_html = models.CharField(max_length=1000)
+    text_json = models.CharField(max_length=1000)
     status = models.CharField(
         max_length=5,
         null=False,

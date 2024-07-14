@@ -4,19 +4,28 @@ from django.core.mail import get_connection, EmailMultiAlternatives
 from django.template.loader import render_to_string
 
 from codo_app.util.load_email import get_emails, get_reply_to
-from codo_app.util.log import *
+from codo_app.util.log import E, W, l
 from ..models import Teachers, Commission, Commissions
 
 
 def _build_body(data: dict):
     html = render_to_string("correo.html", {"teacher": data})
 
-    # print(html)
+    print(f"el cuerpo del mensaje es: {html}")
     return html
 
 
 def send_email_one(one_data: dict, connection=None):
-    print("enviar el correo a: ", get_emails())
+    """Send one mail
+
+    Args:
+        one_data (dict): _description_
+        connection (_type_, optional): _description_. Defaults to None.
+
+    Returns:
+        _type_: _description_
+    """
+    l(__name__, "enviar el correo a: ", get_emails())
 
     email = EmailMultiAlternatives(
         subject=f'Comisión: {one_data["name commission"]} - {one_data["date"]}',
@@ -60,7 +69,14 @@ def _get_data_commission(commission: Commission):
     }
 
 
-def send_bulk_email(data: list[Commission], cb_update):
+def send_bulk_email(data: list[Commission], message_html:str, cb_update):
+    """Send all emails
+
+    Args:
+        data (list[Commission]): _description_
+        message_html (str): New message to add in email send
+        cb_update (function): function callback to set state
+    """
     # print("----------------------")
     # print(data.values())
     # print("----------------------")
@@ -78,9 +94,12 @@ def send_bulk_email(data: list[Commission], cb_update):
         info.update(_get_data_commission(one))
         info.update(_get_data_teacher(one.id_teacher))
         info.update(_get_data_commissions(one.id_commissions))
+        info.update( {"message": message_html})
 
         if info["email1"] == "email@email.com":
-            l(__name__, f"No sended to {info} | because no have a email valid", type=W)
+            l(__name__,
+              f"No sended to {info} | because no have a email valid",
+              type=W)
             cb_update(data.first().id_commissions, "F")
             continue
         # print("---------------------")
@@ -93,6 +112,8 @@ def send_bulk_email(data: list[Commission], cb_update):
                     username=get_emails()[0]["email"],
                     fail_silently=False,
             ) as connection:
+                
+                print(f"el objeto para el correo: {info}")
                 send_email_one(info, connection).send(fail_silently=False)
 
                 print(f'Enviando el correo a {info.get("email1")}')

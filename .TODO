@@ -1,9 +1,4 @@
 # TODO
 
-- Agregar el editor para generar el texto
-  - https://github.com/ckeditor
-  - https://github.com/HexmosTech/glee
-  - https://www.tiny.cloud/docs/tinymce/7/npm-projects/
-  - https://github.com/editor-js/awesome-editorjs?tab=readme-ov-file
-  - https://github.com/quilljs/quill/
-- 
+- checar si al enviar comision, existe el id, de lo contrario se cancela
+- recargar la lista, si han agregrado un correo nuevo
