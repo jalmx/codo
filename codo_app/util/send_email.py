@@ -69,7 +69,7 @@ def _get_data_commission(commission: Commission):
     }
 
 
-def send_bulk_email(data: list[Commission], message_html:str, cb_update):
+def send_bulk_email(data: list[Commission], message_html: str, cb_update):
     """Send all emails
 
     Args:
@@ -94,7 +94,7 @@ def send_bulk_email(data: list[Commission], message_html:str, cb_update):
         info.update(_get_data_commission(one))
         info.update(_get_data_teacher(one.id_teacher))
         info.update(_get_data_commissions(one.id_commissions))
-        info.update( {"message": message_html})
+        info.update({"message": message_html})
 
         if info["email1"] == "email@email.com":
             l(__name__,
@@ -112,7 +112,7 @@ def send_bulk_email(data: list[Commission], message_html:str, cb_update):
                     username=get_emails()[0]["email"],
                     fail_silently=False,
             ) as connection:
-                
+
                 print(f"el objeto para el correo: {info}")
                 send_email_one(info, connection).send(fail_silently=False)
 
